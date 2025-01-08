@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliação de Desempenho</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+
+        header, main, footer {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        body.dark-mode h1 {
+            color: #ecf0f1;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        body.dark-mode input[type="text"], body.dark-mode input[type="number"] {
+            background-color: #34495e;
+            color: #ecf0f1;
+            border: 1px solid #7f8c8d;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        body.dark-mode button {
+            background-color: #1abc9c;
+        }
+
+        body.dark-mode button:hover {
+            background-color: #16a085;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            background: #fff;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode ul li {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+            background-color: #2c3e50;
+            padding: 20px;
+            text-align: center;
+        }
+
+        body.dark-mode footer {
+            background-color: #1a252f;
+            color: #ecf0f1;
+        }
+
+        footer img {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            font-size: 1.1em;
+            color: #2ecc71;
+            font-weight: bold;
+            display: none;
+        }
+
+        body.dark-mode .feedback {
+            color: #16a085;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .logo {
+            max-width: 200px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: #34495e;
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-mode-toggle" id="toggleDarkMode">Modo Escuro</button>
+
+    <header>
+        <!-- Caminho atualizado para o diretório fornecido -->
+        <img src="file:///C:/Users/Brenno/Documents/Avaliação/img/SILogo.png" alt="Logo da Empresa" class="logo">
+        <h1>Avaliação de Desempenho</h1>
+    </header>
+    <main>
+        <form id="formulario">
+            <label for="nome">Nome do Colaborador:</label>
+            <input type="text" id="nome" aria-label="Digite o nome do colaborador" placeholder="Ex: João Silva" required>
+
+            <label for="notaAA">Nota AA (1 a 100):</label>
+            <input type="number" id="notaAA" min="1" max="100" aria-label="Digite a nota AA" required>
+
+            <label for="notaAL">Nota AL (1 a 100):</label>
+            <input type="number" id="notaAL" min="1" max="100" aria-label="Digite a nota AL" required>
+
+            <button type="submit">Adicionar Colaborador</button>
+        </form>
+
+        <!-- Feedback da inserção do colaborador -->
+        <p id="feedback" class="feedback">Colaborador adicionado com sucesso!</p>
+
+        <h2>Colaboradores Adicionados:</h2>
+        <ul id="listaColaboradores"></ul>
+
+        <button id="btnDownloadCSV">Baixar Dados (CSV)</button>
+        <button id="btnDownloadTxt">Baixar Dados (TXT)</button>
+
+        <!-- Gráfico de Desempenho -->
+        <h3>Desempenho dos Colaboradores</h3>
+        <canvas id="desempenhoChart"></canvas>
+    </main>
+    <footer>
+        <!-- Caminho atualizado para o diretório fornecido -->
+        <img src="file:///C:/Users/Brenno/Documents/Avaliação/img/Ft.png" alt="Rodapé Logo">
+        <p>&copy; 2025 Avaliação de Desempenho. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const colaboradores = [];
+
+        // Referências dos elementos da página
+        const formulario = document.getElementById('formulario');
+        const listaColaboradores = document.getElementById('listaColaboradores');
+        const feedback = document.getElementById('feedback');
+        const btnDownloadCSV = document.getElementById('btnDownloadCSV');
+        const btnDownloadTxt = document.getElementById('btnDownloadTxt');
+        const desempenhoChartCanvas = document.getElementById('desempenhoChart').getContext('2d');
+        const toggleDarkMode = document.getElementById('toggleDarkMode');
+
+        // Adicionar colaborador
+        formulario.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const nome = document.getElementById('nome').value.trim();
+            const notaAA = parseFloat(document.getElementById('notaAA').value);
+            const notaAL = parseFloat(document.getElementById('notaAL').value);
+
+            if (isNaN(notaAA) || isNaN(notaAL) || notaAA < 1 || notaAA > 100 || notaAL < 1 || notaAL > 100) {
+                alert('Por favor, insira notas válidas entre 1 e 100.');
+                return;
+            }
+
+            const media = ((notaAA + notaAL) / 2).toFixed(2);
+
+            colaboradores.push({ nome, notaAA, notaAL, media });
+
+            atualizarLista();
+            mostrarFeedback();
+            atualizarGrafico();
+            formulario.reset();
+        });
+
+        // Atualizar lista de colaboradores
+        function atualizarLista() {
+            listaColaboradores.innerHTML = '';
+            colaboradores.forEach(({ nome, notaAA, notaAL, media }) => {
+                const li = document.createElement('li');
+                li.textContent = `Colaborador: ${nome} - Nota AA: ${notaAA} - Nota AL: ${notaAL} - Média: ${media}`;
+                listaColaboradores.appendChild(li);
+            });
+        }
+
+        // Mostrar feedback ao usuário
+        function mostrarFeedback() {
+            feedback.style.display = 'block';  // Torna o feedback visível
+            setTimeout(() => feedback.style.display = 'none', 3000); // Oculta após 3 segundos
+        }
+
+        // Atualizar gráfico de desempenho
+        function atualizarGrafico() {
+            const nomes = colaboradores.map(colaborador => colaborador.nome);
+            const medias = colaboradores.map(colaborador => colaborador.media);
+
+            // Gerar o gráfico
+            if (window.chart) {
+                window.chart.destroy(); // Se houver um gráfico existente, destrua antes de criar um novo
+            }
+
+            window.chart = new Chart(desempenhoChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: nomes,
+                    datasets: [{
+                        label: 'Média de Desempenho',
+                        data: medias,
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Baixar os dados como arquivo TXT
+        btnDownloadTxt.addEventListener('click', () => {
+            if (colaboradores.length === 0) {
+                alert('Nenhum colaborador adicionado ainda.');
+                return;
+            }
+
+            const conteudo = colaboradores.map(({ nome, notaAA, notaAL, media }) =>
+                `Colaborador: ${nome}\nNota AA: ${notaAA}\nNota AL: ${notaAL}\nMédia: ${media}\n---\n`
+            ).join('');
+
+            const blob = new Blob([conteudo], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'avaliacao_desempenho.txt';
+            link.click();
+        });
+
+        // Baixar os dados como arquivo CSV
+        btnDownloadCSV.addEventListener('click', () => {
+            if (colaboradores.length === 0) {
+                alert('Nenhum colaborador adicionado ainda.');
+                return;
+            }
+
+            // Cabeçalho com as colunas
+            const cabecalho = 'Colaborador;Nota AA;Nota AL;Média\n';
+
+            // Criando o conteúdo do CSV
+            const conteudo = colaboradores.map(({ nome, notaAA, notaAL, media }) =>
+                `${nome};${notaAA};${notaAL};${media}`
+            ).join('\n');
+
+            const csv = cabecalho + conteudo;
+
+            // Criando o arquivo CSV
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'avaliacao_desempenho.csv';
+            link.click();
+        });
+
+        // Alternar modo escuro/claro
+        toggleDarkMode.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            toggleDarkMode.textContent = document.body.classList.contains('dark-mode') ? 'Modo Claro' : 'Modo Escuro';
+        });
+    </script>
+</body>
+</html>
