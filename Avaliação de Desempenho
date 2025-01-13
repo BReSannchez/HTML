@@ -184,7 +184,6 @@
             <button type="submit">Adicionar Colaborador</button>
         </form>
 
-        <!-- Feedback da inserção do colaborador -->
         <p id="feedback" class="feedback">Colaborador adicionado com sucesso!</p>
 
         <h2>Colaboradores Adicionados:</h2>
@@ -193,12 +192,10 @@
         <button id="btnDownloadCSV">Baixar Dados (CSV)</button>
         <button id="btnDownloadTxt">Baixar Dados (TXT)</button>
 
-        <!-- Gráfico de Desempenho -->
         <h3>Desempenho dos Colaboradores</h3>
         <canvas id="desempenhoChart"></canvas>
     </main>
     <footer>
-        <!-- Caminho atualizado para o diretório fornecido -->
         <img src="file:///C:/Users/Brenno/Documents/Avaliação/img/Ft.png" alt="Rodapé Logo">
         <p>&copy; 2025 Avaliação de Desempenho. Todos os direitos reservados.</p>
     </footer>
@@ -207,7 +204,6 @@
     <script>
         const colaboradores = [];
 
-        // Referências dos elementos da página
         const formulario = document.getElementById('formulario');
         const listaColaboradores = document.getElementById('listaColaboradores');
         const feedback = document.getElementById('feedback');
@@ -216,7 +212,6 @@
         const desempenhoChartCanvas = document.getElementById('desempenhoChart').getContext('2d');
         const toggleDarkMode = document.getElementById('toggleDarkMode');
 
-        // Adicionar colaborador
         formulario.addEventListener('submit', (event) => {
             event.preventDefault();
 
@@ -239,7 +234,6 @@
             formulario.reset();
         });
 
-        // Atualizar lista de colaboradores
         function atualizarLista() {
             listaColaboradores.innerHTML = '';
             colaboradores.forEach(({ nome, notaAA, notaAL, media }) => {
@@ -249,20 +243,17 @@
             });
         }
 
-        // Mostrar feedback ao usuário
         function mostrarFeedback() {
             feedback.style.display = 'block';  // Torna o feedback visível
-            setTimeout(() => feedback.style.display = 'none', 3000); // Oculta após 3 segundos
+            setTimeout(() => feedback.style.display = 'none', 3000);
         }
 
-        // Atualizar gráfico de desempenho
         function atualizarGrafico() {
             const nomes = colaboradores.map(colaborador => colaborador.nome);
             const medias = colaboradores.map(colaborador => colaborador.media);
 
-            // Gerar o gráfico
             if (window.chart) {
-                window.chart.destroy(); // Se houver um gráfico existente, destrua antes de criar um novo
+                window.chart.destroy();
             }
 
             window.chart = new Chart(desempenhoChartCanvas, {
@@ -289,7 +280,6 @@
             });
         }
 
-        // Baixar os dados como arquivo TXT
         btnDownloadTxt.addEventListener('click', () => {
             if (colaboradores.length === 0) {
                 alert('Nenhum colaborador adicionado ainda.');
@@ -307,24 +297,20 @@
             link.click();
         });
 
-        // Baixar os dados como arquivo CSV
         btnDownloadCSV.addEventListener('click', () => {
             if (colaboradores.length === 0) {
                 alert('Nenhum colaborador adicionado ainda.');
                 return;
             }
 
-            // Cabeçalho com as colunas
             const cabecalho = 'Colaborador;Nota AA;Nota AL;Média\n';
 
-            // Criando o conteúdo do CSV
             const conteudo = colaboradores.map(({ nome, notaAA, notaAL, media }) =>
                 `${nome};${notaAA};${notaAL};${media}`
             ).join('\n');
 
             const csv = cabecalho + conteudo;
 
-            // Criando o arquivo CSV
             const blob = new Blob([csv], { type: 'text/csv' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -332,7 +318,6 @@
             link.click();
         });
 
-        // Alternar modo escuro/claro
         toggleDarkMode.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             toggleDarkMode.textContent = document.body.classList.contains('dark-mode') ? 'Modo Claro' : 'Modo Escuro';
